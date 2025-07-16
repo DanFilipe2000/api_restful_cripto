@@ -1,7 +1,7 @@
 const messageService = require('../services/messageService');
 
 module.exports = {
-  async getAll(req, res) {
+  async getAll(_req, res) {
     try {
       const messages = await messageService.getAll();
       res.json(messages);
@@ -9,6 +9,7 @@ module.exports = {
       res.status(500).json({ message: err.message });
     }
   },
+
   async getById(req, res) {
     try {
       const message = await messageService.getById(req.params.id);
@@ -18,6 +19,7 @@ module.exports = {
       res.status(500).json({ message: err.message });
     }
   },
+
   async create(req, res) {
     try {
       const message = await messageService.create(req.body);
@@ -26,6 +28,7 @@ module.exports = {
       res.status(400).json({ message: err.message });
     }
   },
+
   async update(req, res) {
     try {
       const message = await messageService.update(req.params.id, req.body);
@@ -35,6 +38,7 @@ module.exports = {
       res.status(400).json({ message: err.message });
     }
   },
+
   async remove(req, res) {
     try {
       const ok = await messageService.remove(req.params.id);

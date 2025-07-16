@@ -1,12 +1,14 @@
 {
   "name": "back-end",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js",
     "create-db": "node ./database/create_db.js",
-    "seed-db": "node ./database/seed_db.js"
+    "seed-db": "node ./database/seed_db.js",
+    "test-rsa": "node ./utils/crypto/test_rsa.js"
   },
   "keywords": [],
   "author": "",

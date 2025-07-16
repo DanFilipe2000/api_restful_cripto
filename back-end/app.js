@@ -3,7 +3,12 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 
+
 app.use(express.json());
+
+// Middleware de log para todas as rotas
+const logRequest = require('./middlewares/logRequest');
+app.use(logRequest);
 
 // Importa os routers
 const loginRouter = require('./routes/login');

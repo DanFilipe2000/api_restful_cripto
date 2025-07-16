@@ -1,28 +1,21 @@
-const db = require('../database/connection');
+const ChatModel = require('../database/models/chat');
 
-const Chat = {
+const ChatService = {
   async getAll() {
-    const [rows] = await db.execute('SELECT * FROM Chat');
-    return rows;
+    return await ChatModel.getAll();
   },
   async getById(id) {
-    const [rows] = await db.execute('SELECT * FROM Chat WHERE id = ?', [id]);
-    return rows[0] || null;
+    return await ChatModel.getById(id);
   },
   async create(data) {
-    const { name } = data;
-    const [result] = await db.execute('INSERT INTO Chat (name) VALUES (?)', [name]);
-    return { id: result.insertId, name };
+    return await ChatModel.create(data);
   },
   async update(id, data) {
-    const { name } = data;
-    await db.execute('UPDATE Chat SET name = ? WHERE id = ?', [name, id]);
-    return this.getById(id);
+    return await ChatModel.update(id, data);
   },
   async remove(id) {
-    const [rows] = await db.execute('DELETE FROM Chat WHERE id = ?', [id]);
-    return rows.affectedRows > 0;
+    return await ChatModel.remove(id);
   }
 };
 
-module.exports = Chat;
+module.exports = ChatService;

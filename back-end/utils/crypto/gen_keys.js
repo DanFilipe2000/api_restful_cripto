@@ -1,119 +1,87 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
-// Função para gerar número aleatório com n bits
-function getRandomBigInt(bits) {
-  const bytes = Math.ceil(bits / 8);
-  let randomBytes = crypto.randomBytes(bytes);
-  let randomBigInt = BigInt('0x' + randomBytes.toString('hex'));
-  // Garante que tenha exatamente o número de bits solicitado
-  return randomBigInt | (1n << BigInt(bits - 1));
-}
+function millerRabinTest(n, k) {
+  if (n < 2) return false;
+  if (n === 2 || n === 3) return true;
+  if (n % 2 === 0) return false;
 
-// Função para gerar número aleatório entre min e max (inclusive)
-function randomBetween(min, max) {
-  const range = max - min + 1n;
-  const bits = range.toString(2).length;
-  let x;
-  do {
-    x = getRandomBigInt(bits);
-  } while (x < min || x > max);
-  return x;
-}
-
-// Teste de Miller-Rabin
-function millerRabinTest(n, k = 5) {
-  if (n < 2n) return false;
-  if (n === 2n || n === 3n) return true;
-  if (n % 2n === 0n) return false;
-
-  let s = 0n;
-  let d = n - 1n;
-  while (d % 2n === 0n) {
-    d /= 2n;
-    s += 1n;
+  let s = 0;
+  let d = n - 1;
+  while (d % 2 === 0) {
+    d = Math.floor(d / 2);
+    s += 1;
   }
 
   for (let i = 0; i < k; i++) {
-    const a = randomBetween(2n, n - 2n);
-    let x = modPow(a, d, n);
-    if (x === 1n || x === n - 1n) continue;
+    const a = BigInt(2 + Math.floor(Math.random() * (n - 3)));
+    let x = modPow(a, BigInt(d), BigInt(n));
+    if (x === 1n || x === BigInt(n - 1)) continue;
 
     let continueOuter = false;
-    for (let r = 0n; r < s - 1n; r++) {
-      x = modPow(x, 2n, n);
+    for (let j = 0; j < s - 1; j++) {
+      x = modPow(x, 2n, BigInt(n));
       if (x === 1n) return false;
-      if (x === n - 1n) {
+      if (x === BigInt(n - 1)) {
         continueOuter = true;
         break;
       }
     }
-
     if (!continueOuter) return false;
   }
-
   return true;
 }
 
-// Exponenciação modular: (base^exp) % mod
 function modPow(base, exp, mod) {
   let result = 1n;
   base %= mod;
   while (exp > 0n) {
     if (exp % 2n === 1n) result = (result * base) % mod;
+    exp = exp >> 1n;
     base = (base * base) % mod;
-    exp /= 2n;
   }
   return result;
 }
 
-// Geração de número primo grande
 function genLargePrime(bits = 1024) {
   while (true) {
-    const candidate = getRandomBigInt(bits) | 1n; // força ser ímpar
-    if (millerRabinTest(candidate, 5)) return candidate;
+    const buf = crypto.randomBytes(bits / 8);
+    const n = BigInt('0x' + buf.toString('hex'));
+    if (millerRabinTest(Number(n), 5)) return n;
   }
 }
 
-// Máximo divisor comum (GCD)
 function gcd(a, b) {
-  while (b !== 0n) {
+  while (b !== 0) {
     [a, b] = [b, a % b];
   }
   return a;
 }
 
-// Gera número coprimo com n
 function genCoprime(n) {
-  while (true) {
-    const e = randomBetween(2n, n - 1n);
-    if (gcd(e, n) === 1n) return e;
-  }
+  let e;
+  do {
+    e = Math.floor(Math.random() * (n - 2)) + 2;
+  } while (gcd(e, n) !== 1);
+  return BigInt(e);
 }
 
-// Inverso modular (a⁻¹ mod m)
-function modInverse(a, m) {
-  let m0 = m, x0 = 0n, x1 = 1n;
-  while (a > 1n) {
-    const q = a / m;
-    [a, m] = [m, a % m];
-    [x0, x1] = [x1 - q * x0, x0];
+function modInverse(e, phi) {
+  let [a, b] = [phi, e];
+  let [x0, x1] = [0n, 1n];
+  while (b !== 0n) {
+    const q = a / b;
+    [a, b] = [b, a % b];
+    [x0, x1] = [x1, x0 - q * x1];
   }
-  if (x1 < 0n) x1 += m0;
-  return x1;
+  return x0 < 0n ? x0 + phi : x0;
 }
 
-// Geração de chaves RSA
-function genKeys(bits = 1024) {
-  const p = genLargePrime(bits);
-  const q = genLargePrime(bits);
+export function genKeys(bits = 1024, pInput = null, qInput = null) {
+  const p = pInput || genLargePrime(bits);
+  const q = qInput || genLargePrime(bits);
   const n = p * q;
   const phi = (p - 1n) * (q - 1n);
-  const e = genCoprime(phi);
+  const e = genCoprime(Number(phi));
   const d = modInverse(e, phi);
-  return {
-    publicKey: { e, n },
-    privateKey: { d, n }
-  };
+  return { publicKey: [e, n], privateKey: [d, n] };
 }
-
-module.exports = { genKeys };

@@ -1,28 +1,21 @@
-const db = require('../database/connection');
+const FriendshipModel = require('../database/models/friendship');
 
-const Friendship = {
+const FriendshipService = {
   async getAll() {
-    const [rows] = await db.execute('SELECT * FROM Friendships');
-    return rows;
+    return await FriendshipModel.getAll();
   },
-  async getById(id) {
-    const [rows] = await db.execute('SELECT * FROM Friendships WHERE id = ?', [id]);
-    return rows[0] || null;
+  async getById(user_id, friend_id) {
+    return await FriendshipModel.getById(user_id, friend_id);
   },
   async create(data) {
-    const { user_id_1, user_id_2 } = data;
-    const [result] = await db.execute('INSERT INTO Friendships (user_id_1, user_id_2) VALUES (?, ?)', [user_id_1, user_id_2]);
-    return { id: result.insertId, user_id_1, user_id_2 };
+    return await FriendshipModel.create(data);
   },
-  async update(id, data) {
-    const { user_id_1, user_id_2 } = data;
-    await db.execute('UPDATE Friendships SET user_id_1 = ?, user_id_2 = ? WHERE id = ?', [user_id_1, user_id_2, id]);
-    return this.getById(id);
+  async update(user_id, friend_id, data) {
+    return await FriendshipModel.update(user_id, friend_id, data);
   },
-  async remove(id) {
-    const [rows] = await db.execute('DELETE FROM Friendships WHERE id = ?', [id]);
-    return rows.affectedRows > 0;
+  async remove(user_id, friend_id) {
+    return await FriendshipModel.remove(user_id, friend_id);
   }
 };
 
-module.exports = Friendship;
+module.exports = FriendshipService;
