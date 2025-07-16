@@ -1,4 +1,7 @@
+
 const ChatModel = require('../database/models/chat');
+const ChatFullModel = require('../database/models/chat_full');
+
 
 const ChatService = {
   async getAll() {
@@ -15,6 +18,9 @@ const ChatService = {
   },
   async remove(id) {
     return await ChatModel.remove(id);
+  },
+  async getChatsWithMessagesAndUsersByUserId(userId) {
+    return await ChatFullModel.getChatsWithMessagesAndUsersByUserId(userId);
   }
 };
 

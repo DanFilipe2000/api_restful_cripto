@@ -43,5 +43,14 @@ module.exports = {
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
+  },
+  async getChatsWithMessagesAndUsersByUserId(req, res) {
+    try {
+      const userId = req.params.userId;
+      const chats = await chatService.getChatsWithMessagesAndUsersByUserId(userId);
+      res.json(chats);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
   }
 };

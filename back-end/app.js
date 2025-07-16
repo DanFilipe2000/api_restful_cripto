@@ -2,9 +2,15 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-
+const cors = require('cors');
 
 app.use(express.json());
+
+app.use(cors({
+  origin: '*', // ou '*' para liberar tudo (não recomendado para produção)
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // Middleware de log para todas as rotas
 const logRequest = require('./middlewares/logRequest');

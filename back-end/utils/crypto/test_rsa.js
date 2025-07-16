@@ -1,5 +1,5 @@
 
-import crypto from 'node:crypto';
+const crypto = require('crypto');
 
 console.log("🔐 Gerando chaves RSA...");
 const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
