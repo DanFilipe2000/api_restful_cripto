@@ -40,7 +40,7 @@ function renderChats(chats, loggedUserId) {
         <p>${lastMsg}</p>
         <span class="time">${chat.created_at ? new Date(chat.created_at).toLocaleString() : ''}</span>
       </a>
-      <div class="chat-users">
+      <div class="chat-users" style="margin-left: 10px;">
         <small>Participantes: ${(chat.users || []).map(u => u.username).join(', ')}</small>
       </div>
     `;

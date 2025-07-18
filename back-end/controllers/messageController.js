@@ -22,7 +22,12 @@ module.exports = {
 
   async create(req, res) {
     try {
-      const message = await messageService.create(req.body);
+      // Extrai os campos corretos do payload
+      const { payload } = req.body;
+      if (!payload || !payload.chat_id || !payload.sender_id || !payload.content) {
+        return res.status(400).json({ message: 'Dados da mensagem incompletos' });
+      }
+      const message = await messageService.create(payload);
       res.status(201).json(message);
     } catch (err) {
       res.status(400).json({ message: err.message });

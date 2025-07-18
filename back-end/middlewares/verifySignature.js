@@ -27,7 +27,7 @@ async function verifySignature(req, res, next) {
             Buffer.from(JSON.stringify(payload)),
             {
                 key: user.public_key,
-                padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                padding: crypto.constants.RSA_PKCS1_PADDING,
             },
             Buffer.from(signature, 'base64')
         );
